@@ -1,0 +1,1384 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DALTON GRAND HOTEL</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --gold: #C9A962;
+            --gold-light: #E5D5A8;
+            --dark: #1A1A1A;
+            --darker: #0F0F0F;
+            --light: #F5F0E8;
+            --white: #FFFFFF;
+            --error: #E74C3C;
+            --success: #27AE60;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            background: var(--darker);
+            color: var(--light);
+            overflow-x: hidden;
+        }
+
+        /* Loading Screen */
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--darker);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.8s ease, visibility 0.8s;
+        }
+
+        .loader.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .loader-text {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            color: var(--gold);
+            letter-spacing: 0.3em;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.4; }
+            50% { opacity: 1; }
+        }
+
+        /* Hero Section */
+        .hero {
+            position: relative;
+            height: 100vh;
+            min-height: 700px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        .hero-bg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(15,15,15,0.8) 0%, rgba(26,26,26,0.6) 100%),
+                        url('https://images.unsplash.com/photo-1566073771259-6a8506099945?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80') center/cover;
+            filter: brightness(0.7);
+            transform: scale(1.1);
+            animation: slowZoom 20s infinite alternate;
+        }
+
+        @keyframes slowZoom {
+            to { transform: scale(1.2); }
+        }
+
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding: 2rem;
+            max-width: 900px;
+        }
+
+        .hotel-name {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(3rem, 8vw, 6rem);
+            font-weight: 300;
+            color: var(--white);
+            letter-spacing: 0.15em;
+            margin-bottom: 0.5rem;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeUp 1s ease forwards 0.5s;
+        }
+
+        .hotel-tagline {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            font-style: italic;
+            color: var(--gold-light);
+            margin-bottom: 2rem;
+            opacity: 0;
+            transform: translateY(30px);
+            animation: fadeUp 1s ease forwards 0.8s;
+        }
+
+        .scroll-indicator {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+            opacity: 0;
+            animation: fadeUp 1s ease forwards 1.5s;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        .scroll-indicator:hover {
+            transform: translateX(-50%) translateY(5px);
+        }
+
+        .scroll-text {
+            font-size: 0.75rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--gold);
+        }
+
+        .scroll-line {
+            width: 1px;
+            height: 60px;
+            background: linear-gradient(to bottom, var(--gold), transparent);
+            animation: scrollBounce 2s infinite;
+        }
+
+        @keyframes scrollBounce {
+            0%, 100% { transform: scaleY(1); opacity: 1; }
+            50% { transform: scaleY(0.5); opacity: 0.5; }
+        }
+
+        @keyframes fadeUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 1.5rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+            transition: all 0.4s ease;
+            background: transparent;
+        }
+
+        .nav.scrolled {
+            background: rgba(15, 15, 15, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 3rem;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.3);
+        }
+
+        .nav-logo {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            color: var(--gold);
+            letter-spacing: 0.2em;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--light);
+            text-decoration: none;
+            font-size: 0.85rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            transition: color 0.3s;
+            position: relative;
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 1px;
+            background: var(--gold);
+            transition: width 0.3s;
+        }
+
+        .nav-links a:hover {
+            color: var(--gold);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* Main Content */
+        .main-content {
+            position: relative;
+            z-index: 10;
+            background: var(--darker);
+        }
+
+        /* Section Styling */
+        .section {
+            padding: 6rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .section-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .section-label {
+            font-size: 0.8rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .section-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 300;
+            color: var(--white);
+            margin-bottom: 1rem;
+        }
+
+        .section-subtitle {
+            color: rgba(245, 240, 232, 0.7);
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Booking Form Container */
+        .booking-container {
+            background: linear-gradient(145deg, rgba(26,26,26,0.9) 0%, rgba(15,15,15,0.95) 100%);
+            border: 1px solid rgba(201, 169, 98, 0.2);
+            border-radius: 4px;
+            padding: 3rem;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+        }
+
+        .booking-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+
+        /* Form Grid */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            position: relative;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.75rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 0.75rem;
+            font-weight: 500;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 1rem 1.25rem;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(201, 169, 98, 0.3);
+            border-radius: 2px;
+            color: var(--white);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        .form-input::placeholder {
+            color: rgba(245, 240, 232, 0.4);
+        }
+
+        .form-input:hover {
+            border-color: rgba(201, 169, 98, 0.5);
+            background: rgba(255,255,255,0.05);
+        }
+
+        .form-input:focus {
+            border-color: var(--gold);
+            background: rgba(255,255,255,0.07);
+            box-shadow: 0 0 0 3px rgba(201, 169, 98, 0.1);
+        }
+
+        select.form-input {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23C9A962' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10l-5 5z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+        }
+
+        select.form-input option {
+            background: var(--dark);
+            color: var(--light);
+        }
+
+        /* Date Inputs */
+        .date-group {
+            position: relative;
+        }
+
+        .date-group input[type="date"] {
+            position: relative;
+        }
+
+        .date-group input[type="date"]::-webkit-calendar-picker-indicator {
+            filter: invert(0.8) sepia(1) saturate(5) hue-rotate(10deg);
+            cursor: pointer;
+        }
+
+        /* Room Selection Cards */
+        .room-selection {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .room-card {
+            position: relative;
+            border: 1px solid rgba(201, 169, 98, 0.2);
+            border-radius: 4px;
+            padding: 1.5rem;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            background: rgba(255,255,255,0.02);
+            overflow: hidden;
+        }
+
+        .room-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(201,169,98,0.1) 0%, transparent 100%);
+            opacity: 0;
+            transition: opacity 0.4s;
+        }
+
+        .room-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--gold);
+            box-shadow: 0 10px 30px rgba(201, 169, 98, 0.1);
+        }
+
+        .room-card:hover::before {
+            opacity: 1;
+        }
+
+        .room-card.selected {
+            border-color: var(--gold);
+            background: rgba(201, 169, 98, 0.08);
+            box-shadow: 0 0 20px rgba(201, 169, 98, 0.15);
+        }
+
+        .room-card.selected::after {
+            content: '✓';
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 24px;
+            height: 24px;
+            background: var(--gold);
+            color: var(--dark);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+        }
+
+        .room-icon {
+            font-size: 2rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .room-name {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.3rem;
+            color: var(--white);
+            margin-bottom: 0.5rem;
+        }
+
+        .room-price {
+            font-size: 0.9rem;
+            color: var(--gold);
+            font-weight: 500;
+        }
+
+        .room-desc {
+            font-size: 0.85rem;
+            color: rgba(245, 240, 232, 0.6);
+            margin-top: 0.5rem;
+            line-height: 1.4;
+        }
+
+        /* Radio Button Hidden */
+        .room-radio {
+            position: absolute;
+            opacity: 0;
+        }
+
+        /* Special Requests */
+        .textarea-group {
+            margin-bottom: 2rem;
+        }
+
+        .form-textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 1rem 1.25rem;
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(201, 169, 98, 0.3);
+            border-radius: 2px;
+            color: var(--white);
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.95rem;
+            resize: vertical;
+            transition: all 0.3s;
+            outline: none;
+        }
+
+        .form-textarea:focus {
+            border-color: var(--gold);
+            background: rgba(255,255,255,0.07);
+            box-shadow: 0 0 0 3px rgba(201, 169, 98, 0.1);
+        }
+
+        /* Submit Button */
+        .submit-btn {
+            width: 100%;
+            padding: 1.25rem;
+            background: linear-gradient(135deg, var(--gold) 0%, #B8944F 100%);
+            color: var(--dark);
+            border: none;
+            border-radius: 2px;
+            font-family: 'Montserrat', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 600;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            cursor: pointer;
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: left 0.6s;
+        }
+
+        .submit-btn:hover::before {
+            left: 100%;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(201, 169, 98, 0.3);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Price Summary */
+        .price-summary {
+            background: rgba(201, 169, 98, 0.05);
+            border: 1px solid rgba(201, 169, 98, 0.2);
+            border-radius: 4px;
+            padding: 2rem;
+            margin-top: 2rem;
+            display: none;
+        }
+
+        .price-summary.visible {
+            display: block;
+            animation: slideDown 0.4s ease;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            font-size: 0.95rem;
+        }
+
+        .summary-row.total {
+            border-top: 1px solid rgba(201, 169, 98, 0.3);
+            padding-top: 1rem;
+            margin-top: 1rem;
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: var(--gold);
+        }
+
+        /* Success Message */
+        .success-message {
+            display: none;
+            text-align: center;
+            padding: 3rem 2rem;
+            background: rgba(39, 174, 96, 0.1);
+            border: 1px solid rgba(39, 174, 96, 0.3);
+            border-radius: 4px;
+            margin-top: 2rem;
+        }
+
+        .success-message.visible {
+            display: block;
+            animation: fadeUp 0.6s ease;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+        }
+
+        .success-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2rem;
+            color: var(--white);
+            margin-bottom: 1rem;
+        }
+
+        .success-text {
+            color: rgba(245, 240, 232, 0.8);
+            line-height: 1.6;
+        }
+
+        /* Features Section */
+        .features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-top: 4rem;
+        }
+
+        .feature {
+            text-align: center;
+            padding: 2rem;
+            transition: transform 0.3s;
+        }
+
+        .feature:hover {
+            transform: translateY(-10px);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1.5rem;
+            display: block;
+        }
+
+        .feature-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.5rem;
+            color: var(--white);
+            margin-bottom: 0.75rem;
+        }
+
+        .feature-text {
+            color: rgba(245, 240, 232, 0.7);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--dark);
+            padding: 4rem 2rem 2rem;
+            border-top: 1px solid rgba(201, 169, 98, 0.1);
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+        }
+
+        .footer-section h3 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.3rem;
+            color: var(--gold);
+            margin-bottom: 1.5rem;
+            letter-spacing: 0.1em;
+        }
+
+        .footer-section p, .footer-section a {
+            color: rgba(245, 240, 232, 0.6);
+            text-decoration: none;
+            line-height: 1.8;
+            font-size: 0.9rem;
+            transition: color 0.3s;
+        }
+
+        .footer-section a:hover {
+            color: var(--gold);
+        }
+
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 3rem auto 0;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255,255,255,0.05);
+            text-align: center;
+            color: rgba(245, 240, 232, 0.4);
+            font-size: 0.85rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav {
+                padding: 1rem;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .booking-container {
+                padding: 2rem 1.5rem;
+            }
+            
+            .form-grid {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+            }
+            
+            .room-selection {
+                grid-template-columns: 1fr;
+            }
+            
+            .section {
+                padding: 4rem 1.5rem;
+            }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--darker);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--gold);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--gold-light);
+        }
+
+        /* Error States */
+        .form-input.error {
+            border-color: var(--error);
+            box-shadow: 0 0 0 3px rgba(231, 76, 60, 0.1);
+        }
+
+        .error-text {
+            color: var(--error);
+            font-size: 0.8rem;
+            margin-top: 0.5rem;
+            display: none;
+        }
+
+        .error-text.visible {
+            display: block;
+            animation: shake 0.4s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        /* Loading State */
+        .btn-loader {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 2px solid rgba(26, 26, 26, 0.3);
+            border-top-color: var(--dark);
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 0 auto;
+        }
+
+        .submit-btn.loading .btn-text {
+            display: none;
+        }
+
+        .submit-btn.loading .btn-loader {
+            display: block;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Parallax Images */
+        .parallax-section {
+            height: 400px;
+            background-attachment: fixed;
+            background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .parallax-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(15, 15, 15, 0.6);
+        }
+
+        .parallax-text {
+            position: relative;
+            z-index: 2;
+            font-family: 'Cormorant Garamond', serif;
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-style: italic;
+            color: var(--white);
+            text-align: center;
+            padding: 2rem;
+            max-width: 800px;
+        }
+
+        /* Guest Counter */
+        .guest-counter {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .counter-btn {
+            width: 40px;
+            height: 40px;
+            border: 1px solid rgba(201, 169, 98, 0.4);
+            background: transparent;
+            color: var(--gold);
+            font-size: 1.2rem;
+            cursor: pointer;
+            border-radius: 2px;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .counter-btn:hover {
+            background: rgba(201, 169, 98, 0.1);
+            border-color: var(--gold);
+        }
+
+        .counter-value {
+            font-size: 1.1rem;
+            font-weight: 500;
+            min-width: 30px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Loading Screen -->
+    <div class="loader" id="loader">
+        <div class="loader-text">DALTON GRAND HOTEL</div>
+    </div>
+
+    <!-- Navigation -->
+    <nav class="nav" id="navbar">
+        <a href="#" class="nav-logo">DALTON GRAND HOTEL</a>
+        <ul class="nav-links">
+            <li><a href="#rooms">Rooms</a></li>
+            <li><a href="#book">Book Now</a></li>
+        </ul>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="hero-bg"></div>
+        <div class="hero-content">
+            <h1 class="hotel-name">Dalton Grand Hotel</h1>
+            <p class="hotel-tagline">Where Timeless Elegance Meets Modern Luxury</p>
+        </div>
+        <div class="scroll-indicator" onclick="document.getElementById('book').scrollIntoView({behavior: 'smooth'})">
+            <span class="scroll-text">Begin Your Journey</span>
+            <div class="scroll-line"></div>
+        </div>
+    </section>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+        <!-- Booking Section -->
+        <section class="section" id="book">
+            <div class="section-header">
+                <span class="section-label">Reservations</span>
+                <h2 class="section-title">Book Your Stay</h2>
+                <p class="section-subtitle">Experience unparalleled luxury and service. Complete the form below to secure your reservation.</p>
+            </div>
+
+            <div class="booking-container">
+                <form id="bookingForm" action="https://formspree.io/f/mvzdrowl" method="POST">
+                    
+                    <!-- Personal Details -->
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">First Name</label>
+                            <input type="text" class="form-input" name="firstName" placeholder="John" required>
+                            <span class="error-text">Please enter your first name</span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Last Name</label>
+                            <input type="text" class="form-input" name="lastName" placeholder="Doe" required>
+                            <span class="error-text">Please enter your last name</span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Email Address</label>
+                            <input type="email" class="form-input" name="email" placeholder="john@example.com" required>
+                            <span class="error-text">Please enter a valid email</span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Phone Number</label>
+                            <input type="tel" class="form-input" name="phone" placeholder="+1 (555) 000-0000" required>
+                            <span class="error-text">Please enter your phone number</span>
+                        </div>
+                    </div>
+
+                    <!-- Stay Details -->
+                    <div class="form-grid">
+                        <div class="form-group date-group">
+                            <label class="form-label">Check-in Date</label>
+                            <input type="date" class="form-input" name="checkIn" id="checkIn" required>
+                            <span class="error-text">Please select a check-in date</span>
+                        </div>
+                        
+                        <div class="form-group date-group">
+                            <label class="form-label">Check-out Date</label>
+                            <input type="date" class="form-input" name="checkOut" id="checkOut" required>
+                            <span class="error-text">Please select a check-out date</span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Adults</label>
+                            <div class="guest-counter">
+                                <button type="button" class="counter-btn" onclick="updateGuests('adults', -1)">−</button>
+                                <span class="counter-value" id="adultsCount">2</span>
+                                <button type="button" class="counter-btn" onclick="updateGuests('adults', 1)">+</button>
+                            </div>
+                            <input type="hidden" name="adults" id="adultsInput" value="2">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Children</label>
+                            <div class="guest-counter">
+                                <button type="button" class="counter-btn" onclick="updateGuests('children', -1)">−</button>
+                                <span class="counter-value" id="childrenCount">0</span>
+                                <button type="button" class="counter-btn" onclick="updateGuests('children', 1)">+</button>
+                            </div>
+                            <input type="hidden" name="children" id="childrenInput" value="0">
+                        </div>
+                    </div>
+
+                    <!-- Room Selection -->
+                    <div style="margin-bottom: 2rem;">
+                        <label class="form-label" style="margin-bottom: 1rem; display: block;">Select Room Type</label>
+                        <div class="room-selection">
+                            <label class="room-card" onclick="selectRoom(this, 'deluxe', 450)">
+                                <input type="radio" name="roomType" value="Deluxe King" class="room-radio" required>
+                                <span class="room-icon">🛏️</span>
+                                <div class="room-name">Deluxe King</div>
+                                <div class="room-price">$450/night</div>
+                                <div class="room-desc">45m² • City View • King Bed</div>
+                            </label>
+                            
+                            <label class="room-card" onclick="selectRoom(this, 'premier', 650)">
+                                <input type="radio" name="roomType" value="Premier Suite" class="room-radio">
+                                <span class="room-icon">🏨</span>
+                                <div class="room-name">Premier Suite</div>
+                                <div class="room-price">$650/night</div>
+                                <div class="room-desc">75m² • Ocean View • Living Area</div>
+                            </label>
+                            
+                            <label class="room-card" onclick="selectRoom(this, 'executive', 950)">
+                                <input type="radio" name="roomType" value="Executive Suite" class="room-radio">
+                                <span class="room-icon">👑</span>
+                                <div class="room-name">Executive Suite</div>
+                                <div class="room-price">$950/night</div>
+                                <div class="room-desc">120m² • Panoramic • Butler Service</div>
+                            </label>
+                            
+                            <label class="room-card" onclick="selectRoom(this, 'presidential', 2500)">
+                                <input type="radio" name="roomType" value="Presidential Suite" class="room-radio">
+                                <span class="room-icon">💎</span>
+                                <div class="room-name">Presidential</div>
+                                <div class="room-price">$2,500/night</div>
+                                <div class="room-desc">300m² • Private Pool • Chef</div>
+                            </label>
+                        </div>
+                        <span class="error-text" id="roomError" style="text-align: center; display: block;">Please select a room type</span>
+                    </div>
+
+                    <!-- Special Requests -->
+                    <div class="textarea-group">
+                        <label class="form-label">Special Requests</label>
+                        <textarea class="form-textarea" name="requests" placeholder="Tell us about any special occasions, dietary requirements, or room preferences..."></textarea>
+                    </div>
+
+                    <!-- Price Summary -->
+                    <div class="price-summary" id="priceSummary">
+                        <div class="summary-row">
+                            <span>Room Rate</span>
+                            <span id="rateDisplay">$0 × 0 nights</span>
+                        </div>
+                        <div class="summary-row">
+                            <span>Taxes & Fees (14%)</span>
+                            <span id="taxDisplay">$0</span>
+                        </div>
+                        <div class="summary-row total">
+                            <span>Estimated Total</span>
+                            <span id="totalDisplay">$0</span>
+                        </div>
+                    </div>
+
+                    <!-- Submit -->
+                    <button type="submit" class="submit-btn" id="submitBtn">
+                        <span class="btn-text">Confirm Reservation</span>
+                        <div class="btn-loader"></div>
+                    </button>
+
+                    <!-- Success Message -->
+                    <div class="success-message" id="successMessage">
+                        <div class="success-icon">✓</div>
+                        <h3 class="success-title">Reservation Request Received</h3>
+                        <p class="success-text">
+                            Thank you for choosing Dalton Grand Hotel. We have received your booking request and will send a confirmation to your email shortly.<br><br>
+                            Reference Number: <strong id="refNumber">TGH-2026-0000</strong>
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </section>
+
+        <!-- Parallax Divider -->
+        <div class="parallax-section" style="background-image: url('https://images.unsplash.com/photo-1582719508461-905c673771fd?ixlib=rb-4.0.3&auto=format&fit=crop&w=2025&q=80');">
+            <div class="parallax-overlay"></div>
+            <p class="parallax-text">"Luxury is in each detail."</p>
+        </div>
+
+        <!-- Features Section -->
+        <section class="section" id="amenities">
+            <div class="section-header">
+                <span class="section-label">Experience</span>
+                <h2 class="section-title">Unforgettable Amenities</h2>
+            </div>
+            
+            <div class="features">
+                <div class="feature">
+                    <span class="feature-icon">🍽️</span>
+                    <h3 class="feature-title">Fine Dining</h3>
+                    <p class="feature-text">Michelin-starred chefs crafting exquisite culinary experiences with locally sourced ingredients.</p>
+                </div>
+                
+                <div class="feature">
+                    <span class="feature-icon">💆</span>
+                    <h3 class="feature-title">Luxury Spa</h3>
+                    <p class="feature-text">Rejuvenate your senses in our award-winning spa with bespoke treatments and therapies.</p>
+                </div>
+                
+                <div class="feature">
+                    <span class="feature-icon">🏊</span>
+                    <h3 class="feature-title">Infinity Pool</h3>
+                    <p class="feature-text">Panoramic rooftop pool offering breathtaking views of the city skyline and sunset.</p>
+                </div>
+                
+                <div class="feature">
+                    <span class="feature-icon">🚗</span>
+                    <h3 class="feature-title">Concierge</h3>
+                    <p class="feature-text">24/7 personalized concierge service to cater to your every need and desire.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>Contact</h3>
+                <p>123 Muranga, Kenya<br>
+                12103 - Muranga, Kenya<br>
+                +254 112 399404 <br>
+                info@daltongrandhotel.com</p>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Quick Links</h3>
+                <p>
+                    <a href="#">About Us</a><br>
+                    <a href="#">Rooms & Suites</a><br>
+                    <a href="#">Dining</a><br>
+                    <a href="#">Weddings & Events</a>
+                </p>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Follow Us</h3>
+                <p>
+                    <a href="#">Instagram</a><br>
+                    <a href="#">Facebook</a><br>
+                    <a href="#">Twitter</a><br>
+                    <a href="#">LinkedIn</a>
+                </p>
+            </div>
+            
+            <div class="footer-section">
+                <h3>Newsletter</h3>
+                <p>Subscribe for exclusive offers and updates.</p>
+                <div style="margin-top: 1rem;">
+                    <input type="email" placeholder="Your email" style="padding: 0.75rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(201,169,98,0.3); color: var(--light); width: 100%; margin-bottom: 0.5rem;">
+                    <button style="padding: 0.75rem; background: var(--gold); color: var(--dark); border: none; width: 100%; cursor: pointer; font-weight: 600;">Subscribe</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="footer-bottom">
+            <p>&copy; 2026 The Dalton Grand Hotel. All rights reserved. | Privacy Policy | Terms of Service</p>
+        </div>
+    </footer>
+
+    <script>
+        // Loader
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.getElementById('loader').classList.add('hidden');
+            }, 1500);
+        });
+
+        // Navbar Scroll Effect
+        window.addEventListener('scroll', () => {
+            const navbar = document.getElementById('navbar');
+            if (window.scrollY > 50) {
+                navbar.classList.add('scrolled');
+            } else {
+                navbar.classList.remove('scrolled');
+            }
+        });
+
+        // Date Validation
+        const checkIn = document.getElementById('checkIn');
+        const checkOut = document.getElementById('checkOut');
+        
+        // Set minimum date to today
+        const today = new Date().toISOString().split('T')[0];
+        checkIn.min = today;
+        checkOut.min = today;
+
+        checkIn.addEventListener('change', () => {
+            checkOut.min = checkIn.value;
+            if (checkOut.value && checkOut.value <= checkIn.value) {
+                checkOut.value = '';
+            }
+            calculateTotal();
+        });
+
+        checkOut.addEventListener('change', () => {
+            calculateTotal();
+        });
+
+        // Guest Counter
+        function updateGuests(type, change) {
+            const countEl = document.getElementById(type + 'Count');
+            const inputEl = document.getElementById(type + 'Input');
+            let current = parseInt(countEl.textContent);
+            let newValue = current + change;
+            
+            if (type === 'adults') {
+                if (newValue < 1) newValue = 1;
+                if (newValue > 4) newValue = 4;
+            } else {
+                if (newValue < 0) newValue = 0;
+                if (newValue > 3) newValue = 3;
+            }
+            
+            countEl.textContent = newValue;
+            inputEl.value = newValue;
+        }
+
+        // Room Selection
+        let selectedRoomPrice = 0;
+        let selectedRoomName = '';
+
+        function selectRoom(element, type, price) {
+            // Remove selected from all cards
+            document.querySelectorAll('.room-card').forEach(card => {
+                card.classList.remove('selected');
+            });
+            
+            // Add selected to clicked card
+            element.classList.add('selected');
+            
+            // Check the radio
+            element.querySelector('.room-radio').checked = true;
+            
+            // Update price
+            selectedRoomPrice = price;
+            selectedRoomName = type;
+            
+            // Hide error
+            document.getElementById('roomError').classList.remove('visible');
+            
+            calculateTotal();
+        }
+
+        // Price Calculation
+        function calculateTotal() {
+            const checkInDate = new Date(checkIn.value);
+            const checkOutDate = new Date(checkOut.value);
+            
+            if (checkIn.value && checkOut.value && selectedRoomPrice > 0) {
+                const nights = Math.ceil((checkOutDate - checkInDate) / (1000 * 60 * 60 * 24));
+                
+                if (nights > 0) {
+                    const subtotal = selectedRoomPrice * nights;
+                    const tax = subtotal * 0.14;
+                    const total = subtotal + tax;
+                    
+                    document.getElementById('rateDisplay').textContent = `$${selectedRoomPrice} × ${nights} nights`;
+                    document.getElementById('taxDisplay').textContent = `$${tax.toLocaleString()}`;
+                    document.getElementById('totalDisplay').textContent = `$${total.toLocaleString()}`;
+                    document.getElementById('priceSummary').classList.add('visible');
+                }
+            }
+        }
+
+        // Form Validation & Submission
+        const form = document.getElementById('bookingForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const successMessage = document.getElementById('successMessage');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            // Validate
+            let isValid = true;
+            const requiredFields = form.querySelectorAll('[required]');
+            
+            requiredFields.forEach(field => {
+                if (!field.value.trim()) {
+                    isValid = false;
+                    field.classList.add('error');
+                    field.nextElementSibling?.classList.add('visible');
+                } else {
+                    field.classList.remove('error');
+                    field.nextElementSibling?.classList.remove('visible');
+                }
+            });
+
+            // Check room selection
+            if (!document.querySelector('.room-radio:checked')) {
+                isValid = false;
+                document.getElementById('roomError').classList.add('visible');
+            }
+
+            if (!isValid) return;
+
+            // Check dates
+            if (new Date(checkOut.value) <= new Date(checkIn.value)) {
+                alert('Check-out date must be after check-in date');
+                return;
+            }
+
+            // Loading state
+            submitBtn.classList.add('loading');
+            submitBtn.disabled = true;
+
+            // Generate reference number
+            const refNum = 'TGH-' + new Date().getFullYear() + '-' + Math.floor(1000 + Math.random() * 9000);
+            document.getElementById('refNumber').textContent = refNum;
+
+            // Add reference to form data
+            const refInput = document.createElement('input');
+            refInput.type = 'hidden';
+            refInput.name = 'reference';
+            refInput.value = refNum;
+            form.appendChild(refInput);
+
+            // Submit to Formspree
+            try {
+                const formData = new FormData(form);
+                const response = await fetch(form.action, {
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                if (response.ok) {
+                    // Show success
+                    form.reset();
+                    document.querySelectorAll('.room-card').forEach(c => c.classList.remove('selected'));
+                    document.getElementById('priceSummary').classList.remove('visible');
+                    document.getElementById('adultsCount').textContent = '2';
+                    document.getElementById('childrenCount').textContent = '0';
+                    document.getElementById('adultsInput').value = '2';
+                    document.getElementById('childrenInput').value = '0';
+                    
+                    successMessage.classList.add('visible');
+                    submitBtn.classList.remove('loading');
+                    submitBtn.disabled = false;
+                    
+                    // Scroll to success
+                    successMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                } else {
+                    throw new Error('Submission failed');
+                }
+            } catch (error) {
+                alert('There was an error submitting your reservation. Please try again or contact us directly.');
+                submitBtn.classList.remove('loading');
+                submitBtn.disabled = false;
+            }
+        });
+
+        // Remove error states on input
+        form.querySelectorAll('.form-input').forEach(input => {
+            input.addEventListener('input', function() {
+                this.classList.remove('error');
+                this.nextElementSibling?.classList.remove('visible');
+            });
+        });
+
+        // Smooth scroll for nav links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        // Observe sections
+        document.querySelectorAll('.section-header, .feature, .booking-container').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(30px)';
+            el.style.transition = 'opacity 0.8s ease, transform 0.8s ease';
+            observer.observe(el);
+        });
+    </script>
+</body>
+</html>
